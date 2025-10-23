@@ -111,7 +111,7 @@ end
 local function isPOWResultValid(
 	player: Player,
 	remote: BaseRemoteEvent,
-	pow: proofOfWork.ArkoseSolveResult
+	pow: proofOfWork.ProofOfWorkResult
 ): (boolean, string)
 	if typeof(pow) ~= "table" then
 		return false, `Result must be of type 'table', not '{type(pow)}'`
@@ -170,7 +170,7 @@ end
 local function onServerEvent(
 	remote: BaseRemoteEvent,
 	player: Player,
-	pow: proofOfWork.ArkoseSolveResult,
+	pow: proofOfWork.ProofOfWorkResult,
 	...: any
 )	
 	local valid, err = isPOWResultValid(player, remote, pow)
@@ -193,7 +193,7 @@ local function onServerInvoke(
 	remote: RemoteFunction,
 	callback: RemoteCallbackFn,
 	player: Player,
-	pow: proofOfWork.ArkoseSolveResult,
+	pow: proofOfWork.ProofOfWorkResult,
 	...: any
 )
 	local valid, err = isPOWResultValid(player, remote, pow)
