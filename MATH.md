@@ -1,3 +1,15 @@
+## Average Solve Times
+| Num Leading Zeros (difficulty) | Mean Num of Attempts | Expected Solve Time (seconds) | Mean Solve Time (seconds) |
+| --- | --- | --- | --- |
+| 1 | 16 | 0.0020 | 0.0014 |
+| 2 | 256 | 0.032 | 0.022 |
+| 3 | 4,096 | 0.512 | 0.355 |
+| 4 | 65,536 | 8.19 | 5.67 |
+| 5 | 1,048,576 | 131.07 (~2.18 mins) | 90.8 |
+| 6 | 16,777,216 | 2097.15 (~34.95 mins) | 1453 (~24.2 mins) |
+| 7 | 268,435,456 | 33,554 (~9.32 hrs) | 23,245 (~6.46 hrs) |
+| 8 | 4,294,967,296 | 536,870 (~6.21 days) | 372,000 (~4.3 days) |
+
 ## Solving For Mean Solve Time
 In the proof-of-work solver, we keep hashing an input seed, combined with a random string, until we get a resulting hash with `k` number of leading zeros
 
