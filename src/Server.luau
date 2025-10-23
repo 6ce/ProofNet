@@ -19,8 +19,6 @@ local functionFolder = folder and folder:FindFirstChild("Function")
 
 local isAPlayer = t.instanceIsA("Player")
 
-local remoteCallbacks = {} :: { [BaseRemoteEvent]: { RemoteCallbackFn } }
-
 -- Each has a list of PoW results that we've already seen
 local seenPowResults = {} :: {[Player]: { [string]: boolean }}
 
@@ -62,8 +60,6 @@ local SECURITY_ATTRIBUTES = {
 type RemoteCallbackFn = (player: Player, ...any) -> ...any
 type BaseRemoteEvent = (RemoteEvent | UnreliableRemoteEvent)
 type RemoteClassName = "RemoteEvent" | "UnreliableRemoteEvent" | "RemoteFunction"
-
-type DisconnectFn = () -> ()
 
 if folder then
 	warn(`Networking folder '{folderName}' already exists`)
@@ -169,6 +165,7 @@ end
 
 local function onServerEvent(
 	remote: BaseRemoteEvent,
+	callback: RemoteCallbackFn,
 	player: Player,
 	pow: proofOfWork.ProofOfWorkResult,
 	...: any
@@ -180,13 +177,7 @@ local function onServerEvent(
 		return
 	end
 	
-	local callbacks = remoteCallbacks[remote]
-	
-	if callbacks then
-		for _, callback in callbacks do
-			task.spawn(callback, player, ...)
-		end
-	end
+	callback(player, ...)
 end
 
 local function onServerInvoke(
@@ -213,27 +204,15 @@ local function setupRemoteEvent(
 	
 	remote:SetAttribute(SECURITY_ATTRIBUTES.Seed, generateRandomString(length))
 	remote:SetAttribute(SECURITY_ATTRIBUTES.Difficulty, DEFAULT_POW_DIFFICULTY)
-	
-	if remote:IsA("BaseRemoteEvent") then
-		remoteCallbacks[remote]  = remoteCallbacks[remote] or {}
-		
-		return remote.OnServerEvent:Connect(function(...)
-			onServerEvent(remote, ...)
-		end)
-	end
 end
 
 local function connectCallbackTo(
 	remote: BaseRemoteEvent,
 	callback: RemoteCallbackFn
-): DisconnectFn
-	local callbacks = remoteCallbacks[remote]
-
-	table.insert(callbacks, callback)
-
-	return function()
-		table.remove(callbacks, table.find(callbacks, callback))
-	end
+): RBXScriptConnection
+	return remote.OnServerEvent:Connect(function(...)
+		onServerEvent(remote, callback, ...)
+	end)
 end
 
 local function getOrCreateRemote(
@@ -351,7 +330,7 @@ end
 function module:On(
 	event: string,
 	callback: RemoteCallbackFn
-): DisconnectFn
+): RBXScriptConnection
 	assert(t.string(event))
 	assert(t.callback(callback))
 	
@@ -432,7 +411,7 @@ end
 function module:OnUnreliable(
 	event: string,
 	callback: RemoteCallbackFn
-): DisconnectFn
+): RBXScriptConnection
 	assert(t.string(event))
 	assert(t.callback(callback))
 	
