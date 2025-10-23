@@ -1,4 +1,4 @@
-# Expected Time Math
+## Solving For Mean Solve Time
 In the proof-of-work solver, we keep hashing an input seed, combined with a random string, until we get a resulting hash with `k` number of leading zeros
 
 Each hex digit can take 16 possible values (0-f)
