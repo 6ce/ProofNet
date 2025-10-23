@@ -1,7 +1,9 @@
 --!native
 
-local DEFAULT_TIMEOUT = 10
-local STEP_WAIT_INCREMENT = 1000
+local DEFAULT_TIMEOUT_FACTOR = 5
+local DEFAULT_HASH_RATE = 10_000
+
+local POW_WAIT_INCREMENT = 500
 
 local STRING_LENGTH = 15
 local POSSIBLE_CHARS = {
@@ -48,12 +50,20 @@ local function isSolved(
 	return hashed:sub(1, leadingZeros) == ("0"):rep(leadingZeros)
 end
 
+-- expectedTime = 16 ^ leadingZeros / hashRate
+-- maxTime = expectedTime * timeoutFactor
+local function estimateMaxTimeout(
+	leadingZeros: number
+): number
+	return (16 ^ leadingZeros / DEFAULT_HASH_RATE) * DEFAULT_TIMEOUT_FACTOR
+end
+
 local function proofOfWorkSolver(
 	seed: string,
 	leadingZeros: number,
 	timeout: number?
 ): ProofOfWorkResult?
-	timeout = timeout or DEFAULT_TIMEOUT
+	timeout = timeout or estimateMaxTimeout(leadingZeros)
 	
 	local startTime = os.clock()
 	local iterations = 0
@@ -71,7 +81,7 @@ local function proofOfWorkSolver(
 		
 		iterations += 1
 		
-		if iterations % STEP_WAIT_INCREMENT == 0 then
+		if iterations % POW_WAIT_INCREMENT == 0 then
 			task.wait()
 		end
 		
