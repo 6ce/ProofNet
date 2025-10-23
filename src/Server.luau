@@ -132,8 +132,10 @@ local function isPOWResultValid(
 		return false, `Result hash does not have enough leading zeros ({leadingZeros}/{expectedLeadingZeros}, insufficient difficulty level)`
 	end
 	
-	if #pow.result > MAX_SEED_CHAR_IDX + POW_STRING_LENGTH or #pow.result < 1 then
-		return false, "Result string is too large or is empty"
+	local powLength = #pow.result
+	
+	if powLength > SEED_SIZE_RANGE.Max + POW_STRING_LENGTH or powLength < SEED_SIZE_RANGE.Min then
+		return false, "Result string is too large or is too small"
 	end
 	
 	local seed = remote:GetAttribute(SECURITY_ATTRIBUTES.Seed) or ""
