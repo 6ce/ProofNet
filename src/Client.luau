@@ -91,7 +91,10 @@ function module:Invoke(
 		local seed = remote:GetAttribute(SECURITY_ATTRIBUTES.Seed) or ""
 		local difficulty = remote:GetAttribute(SECURITY_ATTRIBUTES.Difficulty) or 1
 		local pow = proofOfWork(seed, difficulty)
-		return remote:InvokeServer(pow, ...)
+		
+		if pow then
+			return remote:InvokeServer(pow, ...)
+		end
 	end
 end
 
